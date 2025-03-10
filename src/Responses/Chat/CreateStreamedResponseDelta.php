@@ -14,6 +14,7 @@ final class CreateStreamedResponseDelta
         public readonly ?string $content,
         public readonly array $toolCalls,
         public readonly ?CreateStreamedResponseFunctionCall $functionCall,
+        public readonly ?string $reasoningContent,
     ) {}
 
     /**
@@ -30,6 +31,7 @@ final class CreateStreamedResponseDelta
             $attributes['content'] ?? null,
             $toolCalls,
             isset($attributes['function_call']) ? CreateStreamedResponseFunctionCall::from($attributes['function_call']) : null,
+                $attributes['reasoning_content'] ?? null,
         );
     }
 
@@ -50,6 +52,10 @@ final class CreateStreamedResponseDelta
 
         if ($this->toolCalls !== []) {
             $data['tool_calls'] = array_map(fn (CreateStreamedResponseToolCall $toolCall): array => $toolCall->toArray(), $this->toolCalls);
+        }
+
+        if ($this->reasoningContent) {
+            $data['reasoning_content'] = $this->reasoningContent;
         }
 
         return $data;
