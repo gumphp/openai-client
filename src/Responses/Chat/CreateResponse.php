@@ -50,10 +50,10 @@ final class CreateResponse implements ResponseContract, ResponseHasMetaInformati
         ), $attributes['choices']);
 
         return new self(
-            $attributes['id'],
-            $attributes['object'],
-            $attributes['created'],
-            $attributes['model'],
+            $attributes['id'] ?? 'unknown id',
+            $attributes['object'] ?? 'unknown object',
+            $attributes['created'] ?? time(),
+            $attributes['model'] ?? 'unknown model',
             $attributes['system_fingerprint'] ?? null,
             $choices,
             CreateResponseUsage::from($attributes['usage']),
