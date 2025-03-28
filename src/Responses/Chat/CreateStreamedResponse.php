@@ -30,6 +30,8 @@ final class CreateStreamedResponse implements ResponseContract
         public readonly string $model,
         public readonly array $choices,
         public readonly ?CreateResponseUsage $usage,
+        public readonly ?array $botUsage,
+        public readonly ?array $references,
     ) {}
 
     /**
@@ -50,6 +52,8 @@ final class CreateStreamedResponse implements ResponseContract
             $attributes['model'] ?? 'unknown model',
             $choices,
             isset($attributes['usage']) ? CreateResponseUsage::from($attributes['usage']) : null,
+            isset($attributes['bot_usage']) ? $attributes['bot_usage'] : null,
+            isset($attributes['references']) ? $attributes['references'] : null,
         );
     }
 
@@ -73,6 +77,13 @@ final class CreateStreamedResponse implements ResponseContract
             $data['usage'] = $this->usage->toArray();
         }
 
+        if ($this->botUsage) {
+            $data['bot_usage'] = $this->botUsage;
+        }
+
+        if ($this->references) {
+            $data['references'] = $this->references;
+        }
         return $data;
     }
 }
