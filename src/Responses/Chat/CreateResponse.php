@@ -36,6 +36,8 @@ final class CreateResponse implements ResponseContract, ResponseHasMetaInformati
         public readonly array $choices,
         public readonly CreateResponseUsage $usage,
         private readonly MetaInformation $meta,
+        public readonly ?array $botUsage,
+        public readonly ?array $references,
     ) {}
 
     /**
@@ -56,8 +58,14 @@ final class CreateResponse implements ResponseContract, ResponseHasMetaInformati
             $attributes['model'] ?? 'unknown model',
             $attributes['system_fingerprint'] ?? null,
             $choices,
-            CreateResponseUsage::from($attributes['usage']),
+            CreateResponseUsage::from($attributes['usage'] ?? [
+                'prompt_tokens' => $attributes['bot_usage']['model_usage'][0]['prompt_tokens'] ?? 0,
+                'completion_tokens' => $attributes['bot_usage']['model_usage'][0]['completion_tokens'] ?? 0,
+                'total_tokens' => $attributes['bot_usage']['model_usage'][0]['total_tokens'] ?? 0,
+            ]),
             $meta,
+            isset($attributes['bot_usage']) ? $attributes['bot_usage'] : null,
+            isset($attributes['references']) ? $attributes['references'] : null,
         );
     }
 
@@ -66,7 +74,7 @@ final class CreateResponse implements ResponseContract, ResponseHasMetaInformati
      */
     public function toArray(): array
     {
-        return array_filter([
+        $data = array_filter([
             'id' => $this->id,
             'object' => $this->object,
             'created' => $this->created,
@@ -78,5 +86,15 @@ final class CreateResponse implements ResponseContract, ResponseHasMetaInformati
             ),
             'usage' => $this->usage->toArray(),
         ], fn (mixed $value): bool => ! is_null($value));
+
+        if ($this->botUsage) {
+            $data['bot_usage'] = $this->botUsage;
+        }
+
+        if ($this->references) {
+            $data['references'] = $this->references;
+        }
+
+        return $data;
     }
 }
