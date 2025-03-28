@@ -20,9 +20,9 @@ final class CreateResponseUsage
     public static function from(array $attributes): self
     {
         return new self(
-            $attributes['prompt_tokens'],
-            $attributes['completion_tokens'] ?? null,
-            $attributes['total_tokens'],
+            $attributes['prompt_tokens'] ?? 0,
+            $attributes['completion_tokens'] ?? 0,
+            $attributes['total_tokens'] ?? 0,
             isset($attributes['prompt_tokens_details']) ? CreateResponseUsagePromptTokensDetails::from($attributes['prompt_tokens_details']) : null,
             isset($attributes['completion_tokens_details']) ? CreateResponseUsageCompletionTokensDetails::from($attributes['completion_tokens_details']) : null
         );
