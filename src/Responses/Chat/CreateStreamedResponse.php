@@ -45,16 +45,31 @@ final class CreateStreamedResponse implements ResponseContract
             $result
         ), $attributes['choices']);
 
+        $usage = self::getUsage($attributes);
         return new self(
             $attributes['id'] ?? 'unknown id',
             $attributes['object'] ?? 'unknown object',
             $attributes['created'] ?? time(),
             $attributes['model'] ?? 'unknown model',
             $choices,
-            isset($attributes['usage']) ? CreateResponseUsage::from($attributes['usage']) : null,
+            $usage ? CreateResponseUsage::from($usage) : null,
             isset($attributes['bot_usage']) ? $attributes['bot_usage'] : null,
             isset($attributes['references']) ? $attributes['references'] : null,
         );
+    }
+
+    protected static function getUsage(array $attributes)
+    {
+        if (isset($attributes['usage']) && $attributes['usage']) {
+            return $attributes['usage'];
+        }
+        if (isset($attributes['bot_usage']) && $attributes['bot_usage']) {
+            return [
+                'prompt_tokens' => $attributes['bot_usage']['model_usage'][0]['prompt_tokens'] ?? 0,
+                'completion_tokens' => $attributes['bot_usage']['model_usage'][0]['completion_tokens'] ?? 0,
+                'total_tokens' => $attributes['bot_usage']['model_usage'][0]['total_tokens'] ?? 0,
+            ];
+        }
     }
 
     /**
